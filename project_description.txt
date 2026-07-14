@@ -1,0 +1,676 @@
+Import Business Management System (Demo / MVP Development Specification)
+Objective
+
+Develop a professional demo version of the Import Business Management System.
+
+The goal is to demonstrate complete workflows, navigation, UI, dashboards, reporting, and module structure to the client.
+
+This is NOT the final production implementation.
+
+For this phase:
+
+Use mock data.
+Use local database.
+Use fake services instead of real APIs.
+Build clean architecture that can later integrate real APIs without changing UI.
+
+Everything should be modular and production-ready.
+
+Recommended Technology Stack
+Frontend
+React + TypeScript
+Next.js
+TailwindCSS
+ShadCN UI
+React Query
+React Hook Form
+Zod validation
+Chart.js or Recharts
+Backend
+
+Node.js
+
+Express.js
+
+TypeScript
+
+Prisma ORM
+
+REST API
+
+JWT Authentication
+
+Database
+
+PostgreSQL
+
+Seed database with realistic demo data.
+
+Storage
+
+Local storage for uploaded files.
+
+Later replace with AWS S3.
+
+Authentication
+
+JWT
+
+Role Based Access Control
+
+Roles:
+
+Super Admin
+Procurement Officer
+Inventory Manager
+Sales Manager
+Accountant
+Executive
+Architecture
+
+Use Modular Monolith architecture.
+
+Modules should be isolated.
+
+Example:
+
+src/
+
+modules/
+
+    auth/
+
+    procurement/
+
+    suppliers/
+
+    shipments/
+
+    inventory/
+
+    distributors/
+
+    sales/
+
+    finance/
+
+    expenses/
+
+    tax/
+
+    dashboard/
+
+    reports/
+
+    notifications/
+
+    ai/
+
+shared/
+
+database/
+
+middleware/
+
+services/
+
+utils/
+
+Each module must contain:
+
+Controller
+
+Service
+
+Repository
+
+Routes
+
+Validation
+
+Types
+
+DTOs
+UI Requirements
+
+Professional ERP dashboard.
+
+Desktop-first.
+
+Responsive.
+
+Modern admin design.
+
+Use:
+
+Left Sidebar
+
+Top Navigation
+
+Breadcrumbs
+
+Cards
+
+Charts
+
+Tables
+
+Filters
+
+Search
+
+Pagination
+
+Dark Mode ready
+
+Dashboard
+
+Create executive dashboard.
+
+Include demo KPIs:
+
+Total Revenue
+Net Profit
+Gross Profit
+Cash Position
+Inventory Value
+Outstanding Receivables
+Outstanding Payables
+Low Stock
+Shipments in Transit
+Pending Purchase Orders
+
+Charts:
+
+Revenue Trend
+
+Profit Trend
+
+Inventory Value
+
+Sales by Category
+
+Top Products
+
+Top Suppliers
+
+Distributor Performance
+
+Recent Activities
+
+Module 1
+Authentication
+
+Features
+
+Login
+
+Logout
+
+Forgot Password UI
+
+Profile
+
+Role Permissions
+
+Session Management
+
+Mock JWT authentication.
+
+Module 2
+Supplier Management
+
+Supplier List
+
+Create Supplier
+
+Edit Supplier
+
+Delete Supplier
+
+Supplier Profile
+
+Supplier Contacts
+
+Country
+
+Currency
+
+Products
+
+Purchase History
+
+Outstanding Balance
+
+Module 3
+Procurement
+
+Purchase Orders
+
+Create PO
+
+Approval Workflow
+
+PO Status
+
+PO Details
+
+Attachments
+
+Expected Arrival
+
+Purchase History
+
+Module 4
+Shipment Management
+
+Shipment List
+
+Container Details
+
+Shipment Tracking
+
+Shipment Status
+
+Port Information
+
+Estimated Arrival
+
+Freight Cost
+
+Insurance
+
+Duty
+
+Custom Charges
+
+Landed Cost Summary
+
+Timeline UI
+
+Module 5
+Inventory
+
+Product Catalog
+
+Categories
+
+SKU
+
+Barcode Field
+
+Lot Number
+
+Expiry Date
+
+Warehouse
+
+Stock Levels
+
+Goods Receipt
+
+Stock Movement
+
+FIFO Display
+
+Low Stock Alerts
+
+Expiry Alerts
+
+Inventory Valuation
+
+Module 6
+Distributor Management
+
+Distributor List
+
+Distributor Profile
+
+Credit Limit
+
+Outstanding Balance
+
+Payment History
+
+Region
+
+Pricing Group
+
+Sales History
+
+Module 7
+Sales
+
+Sales Orders
+
+Invoices
+
+Returns
+
+Credit Notes
+
+Discount Rules
+
+Regional Pricing
+
+Volume Pricing
+
+Order Timeline
+
+Invoice History
+
+Module 8
+Finance
+
+General Ledger
+
+Journal Entries
+
+Income
+
+Expenses
+
+Cash Position
+
+Bank Accounts
+
+Profit & Loss
+
+Balance Sheet
+
+Cash Flow
+
+Receivables
+
+Payables
+
+Module 9
+Expense Management
+
+Expense Categories
+
+Office Expenses
+
+Marketing
+
+Utilities
+
+Transport
+
+Salaries
+
+Rent
+
+Attachments
+
+Expense Reports
+
+Module 10
+Tax & Compliance
+
+GST
+
+Sales Tax
+
+Withholding Tax
+
+Tax Reports
+
+E-Invoice Screen
+
+FBR Integration Placeholder
+
+Audit Logs
+
+Compliance Dashboard
+
+Module 11
+Reports
+
+Sales Report
+
+Purchase Report
+
+Inventory Report
+
+Profit Report
+
+Cash Flow
+
+Supplier Report
+
+Distributor Report
+
+Expense Report
+
+Tax Report
+
+Export PDF
+
+Export Excel
+
+Print
+
+Module 12
+Notifications
+
+Notification Center
+
+Email Placeholder
+
+SMS Placeholder
+
+WhatsApp Placeholder
+
+Push Notifications Placeholder
+
+Reminder Settings
+
+Alert Settings
+
+Module 13
+AI Dashboard
+
+Demo Only
+
+Do NOT integrate AI.
+
+Create placeholder pages showing:
+
+Demand Forecast
+
+Seasonal Analysis
+
+Import Recommendation
+
+Best Selling Products
+
+Slow Moving Inventory
+
+Predictive Charts
+
+All charts should use generated demo data.
+
+Settings Module
+
+Company Information
+
+Currency
+
+Exchange Rates
+
+Users
+
+Roles
+
+Permissions
+
+Tax Settings
+
+Email Settings
+
+Notification Settings
+
+Backup Settings
+
+System Logs
+
+Demo Data
+
+Generate realistic demo data:
+
+50 Products
+
+20 Suppliers
+
+15 Distributors
+
+100 Purchase Orders
+
+300 Sales Orders
+
+1000 Inventory Transactions
+
+12 Months Revenue
+
+Expenses
+
+Shipments
+
+Payments
+
+Receipts
+
+Dashboards should look populated.
+
+API Design
+
+Create REST endpoints.
+
+Example:
+
+/api/auth
+
+/api/users
+
+/api/suppliers
+
+/api/procurement
+
+/api/shipments
+
+/api/inventory
+
+/api/distributors
+
+/api/sales
+
+/api/finance
+
+/api/expenses
+
+/api/tax
+
+/api/dashboard
+
+/api/reports
+
+/api/notifications
+
+/api/ai
+Database Design
+
+Create normalized database.
+
+Include:
+
+Users
+
+Roles
+
+Permissions
+
+Products
+
+Categories
+
+Suppliers
+
+PurchaseOrders
+
+PurchaseItems
+
+Shipments
+
+ShipmentItems
+
+Inventory
+
+InventoryTransactions
+
+Distributors
+
+SalesOrders
+
+SalesItems
+
+Invoices
+
+Payments
+
+Expenses
+
+Taxes
+
+Notifications
+
+AuditLogs
+
+Settings
+
+Future Integrations (Placeholders Only)
+
+Do not integrate now.
+
+Only create service interfaces for future replacement.
+
+Future integrations:
+
+FBR e-Invoicing API
+WhatsApp Business API
+SMS Gateway
+Email Service
+Currency Exchange API
+AI Forecasting Engine
+Cloud Storage (AWS S3)
+Payment Gateway
+
+Each integration should use an abstraction layer (service interface) so real APIs can be plugged in later without changing business logic.
+
+Code Quality Requirements
+TypeScript everywhere.
+Clean Architecture principles.
+Repository Pattern.
+Service Layer.
+DTOs.
+Input Validation.
+Error Handling.
+Logging.
+Modular folder structure.
+Reusable UI components.
+Environment configuration.
+API documentation using Swagger/OpenAPI.
+Seed scripts for demo data.
+Deliverables
+
+The demo should include:
+
+Fully functional web application.
+Complete navigation across all modules.
+Professional ERP-style UI.
+Mock authentication.
+Seeded PostgreSQL database.
+REST API with mock/business placeholder logic.
+Dashboard with realistic charts.
+CRUD operations for major modules.
+Clean, scalable architecture ready for future production integrations.

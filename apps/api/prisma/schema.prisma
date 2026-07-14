@@ -1,0 +1,667 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ===================== Auth & RBAC =====================
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  key         String           @unique
+  module      String
+  action      String
+  description String?
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  roleId       String
+  isActive     Boolean   @default(true)
+  avatarUrl    String?
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  role                   Role            @relation(fields: [roleId], references: [id])
+  auditLogs              AuditLog[]
+  notifications          Notification[]
+  createdPurchaseOrders  PurchaseOrder[] @relation("POCreator")
+  approvedPurchaseOrders PurchaseOrder[] @relation("POApprover")
+  createdSalesOrders     SalesOrder[]
+  createdExpenses        Expense[]
+  statusChanges          StatusHistory[]
+
+  @@index([roleId])
+}
+
+// ===================== Catalog & Inventory =====================
+
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([parentId])
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  sku          String   @unique
+  barcode      String?  @unique
+  name         String
+  description  String?
+  imageUrl     String?
+  categoryId   String?
+  unit         String   @default("pcs")
+  costPrice    Float
+  sellingPrice Float
+  reorderLevel Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  category      Category?              @relation(fields: [categoryId], references: [id])
+  purchaseItems PurchaseOrderItem[]
+  shipmentItems ShipmentItem[]
+  inventoryLots InventoryLot[]
+  inventoryTxns InventoryTransaction[]
+  salesItems    SalesOrderItem[]
+  salesReturns  SalesReturn[]
+
+  @@index([categoryId])
+}
+
+model Warehouse {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  location String?
+
+  inventoryLots InventoryLot[]
+  transactions  InventoryTransaction[]
+}
+
+model InventoryLot {
+  id          String    @id @default(cuid())
+  productId   String
+  warehouseId String
+  lotNumber   String
+  quantity    Int
+  costPrice   Float
+  expiryDate  DateTime?
+  receivedAt  DateTime  @default(now())
+
+  product   Product   @relation(fields: [productId], references: [id])
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@unique([productId, warehouseId, lotNumber])
+  @@index([expiryDate])
+}
+
+enum InventoryTransactionType {
+  RECEIPT
+  SALE
+  ADJUSTMENT
+  TRANSFER
+  RETURN
+}
+
+model InventoryTransaction {
+  id            String                   @id @default(cuid())
+  productId     String
+  warehouseId   String
+  type          InventoryTransactionType
+  quantity      Int
+  lotNumber     String?
+  referenceType String?
+  referenceId   String?
+  note          String?
+  createdAt     DateTime                 @default(now())
+
+  product   Product   @relation(fields: [productId], references: [id])
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@index([productId])
+  @@index([referenceType, referenceId])
+}
+
+// ===================== Suppliers & Procurement =====================
+
+model Supplier {
+  id        String   @id @default(cuid())
+  name      String
+  country   String
+  currency  String
+  address   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contacts       SupplierContact[]
+  purchaseOrders PurchaseOrder[]
+  payments       Payment[]
+
+  @@index([country])
+}
+
+model SupplierContact {
+  id          String  @id @default(cuid())
+  supplierId  String
+  name        String
+  designation String?
+  email       String?
+  phone       String?
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@index([supplierId])
+}
+
+enum PurchaseOrderStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  ORDERED
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CANCELLED
+}
+
+model PurchaseOrder {
+  id                 String              @id @default(cuid())
+  poNumber           String              @unique
+  supplierId         String
+  status             PurchaseOrderStatus @default(DRAFT)
+  currency           String
+  exchangeRateToBase Float               @default(1)
+  orderDate          DateTime            @default(now())
+  expectedArrival    DateTime?
+  createdById        String
+  approvedById       String?
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  supplier      Supplier            @relation(fields: [supplierId], references: [id])
+  createdBy     User                @relation("POCreator", fields: [createdById], references: [id])
+  approvedBy    User?               @relation("POApprover", fields: [approvedById], references: [id])
+  items         PurchaseOrderItem[]
+  attachments   Attachment[]
+  shipments     Shipment[]
+  statusHistory StatusHistory[]
+
+  @@index([supplierId])
+  @@index([status])
+}
+
+model PurchaseOrderItem {
+  id               String @id @default(cuid())
+  purchaseOrderId  String
+  productId        String
+  quantity         Int
+  unitPrice        Float
+  receivedQuantity Int    @default(0)
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id])
+
+  @@index([purchaseOrderId])
+  @@index([productId])
+}
+
+model Attachment {
+  id              String   @id @default(cuid())
+  fileName        String
+  fileUrl         String
+  fileSize        Int
+  mimeType        String
+  uploadedAt      DateTime @default(now())
+  purchaseOrderId String?
+  expenseId       String?
+
+  purchaseOrder PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  expense       Expense?       @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@index([purchaseOrderId])
+  @@index([expenseId])
+}
+
+// ===================== Shipments =====================
+
+enum ShipmentStatus {
+  BOOKED
+  IN_TRANSIT
+  ARRIVED_AT_PORT
+  CUSTOMS_CLEARANCE
+  DELIVERED
+  DELAYED
+}
+
+model Shipment {
+  id                 String         @id @default(cuid())
+  shipmentNumber     String         @unique
+  purchaseOrderId    String?
+  containerNumber    String?
+  originPort         String
+  destinationPort    String
+  status             ShipmentStatus @default(BOOKED)
+  estimatedArrival   DateTime?
+  actualArrival      DateTime?
+  freightCost        Float          @default(0)
+  insuranceCost      Float          @default(0)
+  dutyCost           Float          @default(0)
+  customsCharges     Float          @default(0)
+  currency           String
+  exchangeRateToBase Float          @default(1)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  purchaseOrder PurchaseOrder?  @relation(fields: [purchaseOrderId], references: [id])
+  items         ShipmentItem[]
+  statusHistory StatusHistory[]
+
+  @@index([purchaseOrderId])
+  @@index([status])
+}
+
+model ShipmentItem {
+  id         String @id @default(cuid())
+  shipmentId String
+  productId  String
+  quantity   Int
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id])
+
+  @@index([shipmentId])
+}
+
+model StatusHistory {
+  id              String   @id @default(cuid())
+  entityType      String
+  status          String
+  note            String?
+  changedAt       DateTime @default(now())
+  changedById     String?
+  purchaseOrderId String?
+  shipmentId      String?
+  salesOrderId    String?
+
+  changedBy     User?          @relation(fields: [changedById], references: [id])
+  purchaseOrder PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  shipment      Shipment?      @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  salesOrder    SalesOrder?    @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+
+  @@index([entityType])
+  @@index([purchaseOrderId])
+  @@index([shipmentId])
+  @@index([salesOrderId])
+}
+
+// ===================== Distributors & Sales =====================
+
+model PricingGroup {
+  id              String @id @default(cuid())
+  name            String @unique
+  discountPercent Float  @default(0)
+
+  distributors Distributor[]
+}
+
+model Distributor {
+  id                 String   @id @default(cuid())
+  name               String
+  region             String
+  creditLimit        Float    @default(0)
+  pricingGroupId     String?
+  contactName        String?
+  contactEmail       String?
+  contactPhone       String?
+  address            String?
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  pricingGroup PricingGroup? @relation(fields: [pricingGroupId], references: [id])
+  salesOrders  SalesOrder[]
+  payments     Payment[]
+
+  @@index([region])
+  @@index([pricingGroupId])
+}
+
+enum SalesOrderStatus {
+  DRAFT
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model SalesOrder {
+  id              String           @id @default(cuid())
+  orderNumber     String           @unique
+  distributorId   String
+  status          SalesOrderStatus @default(DRAFT)
+  orderDate       DateTime         @default(now())
+  currency        String           @default("PKR")
+  discountPercent Float            @default(0)
+  createdById     String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  distributor   Distributor      @relation(fields: [distributorId], references: [id])
+  createdBy     User             @relation(fields: [createdById], references: [id])
+  items         SalesOrderItem[]
+  invoices      Invoice[]
+  returns       SalesReturn[]
+  statusHistory StatusHistory[]
+
+  @@index([distributorId])
+  @@index([status])
+}
+
+model SalesOrderItem {
+  id           String @id @default(cuid())
+  salesOrderId String
+  productId    String
+  quantity     Int
+  unitPrice    Float
+  discount     Float  @default(0)
+
+  salesOrder SalesOrder @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id])
+
+  @@index([salesOrderId])
+  @@index([productId])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique
+  salesOrderId  String
+  issueDate     DateTime      @default(now())
+  dueDate       DateTime
+  totalAmount   Float
+  paidAmount    Float         @default(0)
+  status        InvoiceStatus @default(DRAFT)
+  createdAt     DateTime      @default(now())
+
+  salesOrder  SalesOrder   @relation(fields: [salesOrderId], references: [id])
+  payments    Payment[]
+  creditNotes CreditNote[]
+
+  @@index([salesOrderId])
+  @@index([status])
+}
+
+model SalesReturn {
+  id           String   @id @default(cuid())
+  salesOrderId String
+  productId    String
+  quantity     Int
+  reason       String?
+  createdAt    DateTime @default(now())
+
+  salesOrder SalesOrder  @relation(fields: [salesOrderId], references: [id])
+  product    Product     @relation(fields: [productId], references: [id])
+  creditNote CreditNote?
+
+  @@index([salesOrderId])
+}
+
+model CreditNote {
+  id               String   @id @default(cuid())
+  creditNoteNumber String   @unique
+  invoiceId        String?
+  salesReturnId    String?  @unique
+  amount           Float
+  reason           String?
+  createdAt        DateTime @default(now())
+
+  invoice     Invoice?     @relation(fields: [invoiceId], references: [id])
+  salesReturn SalesReturn? @relation(fields: [salesReturnId], references: [id])
+
+  @@index([invoiceId])
+}
+
+// ===================== Finance =====================
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  INCOME
+  EXPENSE
+}
+
+model Account {
+  id   String      @id @default(cuid())
+  code String      @unique
+  name String
+  type AccountType
+
+  journalLines JournalLine[]
+}
+
+model JournalEntry {
+  id          String   @id @default(cuid())
+  entryDate   DateTime @default(now())
+  description String?
+  reference   String?
+  createdAt   DateTime @default(now())
+
+  lines JournalLine[]
+}
+
+model JournalLine {
+  id             String @id @default(cuid())
+  journalEntryId String
+  accountId      String
+  debit          Float  @default(0)
+  credit         Float  @default(0)
+
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  account      Account      @relation(fields: [accountId], references: [id])
+
+  @@index([journalEntryId])
+  @@index([accountId])
+}
+
+model BankAccount {
+  id            String @id @default(cuid())
+  name          String
+  bankName      String
+  accountNumber String
+  currency      String
+  balance       Float  @default(0)
+
+  payments Payment[]
+}
+
+enum PaymentDirection {
+  INCOMING
+  OUTGOING
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CHEQUE
+  CARD
+  OTHER
+}
+
+model Payment {
+  id            String           @id @default(cuid())
+  direction     PaymentDirection
+  amount        Float
+  method        PaymentMethod
+  currency      String
+  paymentDate   DateTime         @default(now())
+  reference     String?
+  bankAccountId String?
+  supplierId    String?
+  distributorId String?
+  invoiceId     String?
+  createdAt     DateTime         @default(now())
+
+  bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id])
+  supplier    Supplier?    @relation(fields: [supplierId], references: [id])
+  distributor Distributor? @relation(fields: [distributorId], references: [id])
+  invoice     Invoice?     @relation(fields: [invoiceId], references: [id])
+
+  @@index([supplierId])
+  @@index([distributorId])
+  @@index([invoiceId])
+  @@index([bankAccountId])
+}
+
+// ===================== Expenses =====================
+
+model ExpenseCategory {
+  id   String @id @default(cuid())
+  name String @unique
+
+  expenses Expense[]
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  categoryId  String
+  amount      Float
+  description String?
+  expenseDate DateTime @default(now())
+  createdById String
+  createdAt   DateTime @default(now())
+
+  category    ExpenseCategory @relation(fields: [categoryId], references: [id])
+  createdBy   User            @relation(fields: [createdById], references: [id])
+  attachments Attachment[]
+
+  @@index([categoryId])
+}
+
+// ===================== Tax =====================
+
+enum TaxType {
+  GST
+  SALES_TAX
+  WITHHOLDING_TAX
+}
+
+model Tax {
+  id        String  @id @default(cuid())
+  name      String
+  type      TaxType
+  rate      Float
+  appliesTo String?
+  isActive  Boolean @default(true)
+}
+
+// ===================== Notifications =====================
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  WHATSAPP
+  PUSH
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  channel   NotificationChannel @default(IN_APP)
+  title     String
+  message   String
+  isRead    Boolean             @default(false)
+  createdAt DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+// ===================== Audit =====================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([userId])
+}
+
+// ===================== Settings =====================
+
+model CompanySetting {
+  id           String   @id @default(cuid())
+  companyName  String
+  address      String?
+  phone        String?
+  email        String?
+  baseCurrency String   @default("PKR")
+  logoUrl      String?
+  updatedAt    DateTime @updatedAt
+}
+
+model ExchangeRate {
+  id           String   @id @default(cuid())
+  currencyCode String   @unique
+  rateToBase   Float
+  updatedAt    DateTime @updatedAt
+}
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
