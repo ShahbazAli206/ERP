@@ -5,19 +5,12 @@ build/
 out/
 coverage/
 
-.env
-.env.local
-.env.*.local
-
 *.log
 npm-debug.log*
 
 .DS_Store
 Thumbs.db
 
-apps/api/prisma/dev.db
-apps/api/prisma/dev.db-journal
-apps/api/uploads/
 apps/api/src/generated/
 
 .vscode/*

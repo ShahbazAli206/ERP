@@ -35,27 +35,29 @@ Postgres, mock JWT auth, local file storage instead of S3, etc).
 
 ## Setup
 
+`.env`/`.env.local` and the seeded `apps/api/prisma/dev.db` are committed to this repo (a
+deliberate exception to the usual "never commit env files" rule — this is a local-only demo
+with no real secrets, see "A note on committed env files/database" below), so a fresh clone
+already has working config and data. Setup is just:
+
 ```bash
 # 1. Install all workspace dependencies (also runs `prisma generate` for apps/api)
 npm install
 
-# 2. Env files — .env.example already has working demo defaults (SQLite path, a real
-#    generated JWT secret should replace the placeholder before any real deployment)
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env.local
-
-# 3. Apply migrations (creates apps/api/prisma/dev.db). Must run from apps/api — Prisma 7
+# 2. Apply any pending migrations (dev.db already exists and is seeded — this is a no-op
+#    unless the schema has changed since the last commit). Must run from apps/api — Prisma 7
 #    reads DATABASE_URL from apps/api/.env via prisma.config.ts, relative to cwd.
 (cd apps/api && npx prisma migrate deploy)
 
-# 4. Seed demo data (50 products, 20 suppliers, 15 distributors, 100 POs, 300 sales orders,
-#    12 months of financials, 6 users covering all roles)
-npm run seed --workspace=apps/api
-
-# 5. Run both apps (separate terminals)
+# 3. Run both apps (separate terminals)
 npm run dev:api   # http://localhost:4000 — Swagger docs at /api/docs
 npm run dev:web   # http://localhost:3000
 ```
+
+Only re-run `npm run seed --workspace=apps/api` if you intentionally want to add another full
+batch of demo data on top of what's already there — the seed script is not idempotent against
+itself (running it twice roughly doubles products/orders/etc.), so don't run it "just in case"
+on a fresh clone.
 
 Open `http://localhost:3000` — you'll be redirected to `/login`.
 
@@ -105,6 +107,18 @@ This demo is **local-only by design** (see `IMPLEMENTATION_PLAN.md`'s Gap #11) �
 hosted deploy target, Dockerfile, or CI pipeline configured. If a live demo link is needed later,
 that requires a deliberate decision on hosting (SQLite's single-file nature means most serverless
 platforms won't work without switching to Postgres first via `docker-compose.yml`).
+
+## A note on committed env files/database
+
+This repo commits `apps/api/.env`, `apps/api/.env.test`, `apps/web/.env.local`,
+`apps/api/prisma/dev.db` (the seeded SQLite database), and `apps/api/uploads/` (demo attachment
+files) — normally these belong in `.gitignore`. That's a deliberate choice for this project: it's
+a local-only demo (no real secrets — `JWT_SECRET` is a random string with no connection to any
+real service, and every other integration credential in `.env` is blank), and committing them
+means cloning this repo on a new machine gives you the exact same working setup and seeded data
+immediately, with no manual `.env` copying or re-seeding step. If this were ever adapted for
+real use, these would need to move back behind `.gitignore` and `JWT_SECRET` would need to be a
+real per-environment secret, not a committed one.
 
 ## Known demo limitations
 
