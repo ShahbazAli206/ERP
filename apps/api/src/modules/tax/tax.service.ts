@@ -1,5 +1,6 @@
 import { ApiError } from '../../shared/ApiError';
 import type { Pagination } from '../../shared/response';
+import { fbrEInvoiceService } from '../../shared/integrations/fbrEInvoice.service';
 import { taxRepository } from './tax.repository';
 import type {
   AuditLogDto,
@@ -83,11 +84,10 @@ export const taxService = {
   },
 
   eInvoiceStatus(): EInvoiceStatusDto {
-    return {
-      status: 'not_integrated',
-      message:
-        "FBR e-Invoicing integration is a placeholder for this demo — see the project's Phase 4 integration abstractions.",
-    };
+    // Sourced from the formal FBR e-Invoicing abstraction (Phase 4) instead of being
+    // inlined here — same observable response shape as before.
+    const { status, message } = fbrEInvoiceService.getIntegrationStatus();
+    return { status, message };
   },
 
   async listAuditLogs(

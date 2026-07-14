@@ -10,17 +10,20 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/requestLogger';
 import { aiRoutes } from './modules/ai/ai.routes';
 import { authRoutes } from './modules/auth/auth.routes';
+import { dashboardRoutes } from './modules/dashboard/dashboard.routes';
 import { distributorsRoutes } from './modules/distributors/distributors.routes';
 import { expensesRoutes } from './modules/expenses/expenses.routes';
 import { financeRoutes } from './modules/finance/finance.routes';
 import { inventoryRoutes } from './modules/inventory/inventory.routes';
 import { notificationsRoutes } from './modules/notifications/notifications.routes';
 import { procurementRoutes } from './modules/procurement/procurement.routes';
+import { reportsRoutes } from './modules/reports/reports.routes';
 import { salesRoutes } from './modules/sales/sales.routes';
 import { settingsRoutes } from './modules/settings/settings.routes';
 import { shipmentsRoutes } from './modules/shipments/shipments.routes';
 import { suppliersRoutes } from './modules/suppliers/suppliers.routes';
 import { taxRoutes } from './modules/tax/tax.routes';
+import { env } from './config/env';
 
 export function createApp() {
   const app = express();
@@ -32,7 +35,14 @@ export function createApp() {
   app.use(cookieParser());
   app.use(requestLogger);
 
-  const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20 });
+  // Strict in production (real brute-force protection); much more permissive outside it so
+  // local dev/demo work — many legitimate logins in a short window from manual testing or
+  // several frontend agents each verifying against the same running server — doesn't get
+  // locked out for the full 15-minute window.
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: env.NODE_ENV === 'production' ? 20 : 2000,
+  });
   app.use('/api/auth/login', authLimiter);
   app.use('/api/auth/forgot-password', authLimiter);
 
@@ -55,6 +65,8 @@ export function createApp() {
   app.use('/api/notifications', notificationsRoutes);
   app.use('/api/ai', aiRoutes);
   app.use('/api/settings', settingsRoutes);
+  app.use('/api/dashboard', dashboardRoutes);
+  app.use('/api/reports', reportsRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

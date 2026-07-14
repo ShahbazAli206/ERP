@@ -1,6 +1,7 @@
 import type { Prisma } from '../../generated/prisma/client';
 import { prisma } from '../../database/prisma';
 import { toSkipTake } from '../../shared/pagination';
+import { toBaseAmount } from '../../shared/currency';
 import type { ListSuppliersQuery } from './suppliers.validation';
 
 export const suppliersRepository = {
@@ -89,8 +90,16 @@ export const suppliersRepository = {
       }),
     ]);
 
+    // Each PO's item total is in that PO's own transaction currency — convert to base
+    // currency via its own exchangeRateToBase before summing across orders, since a
+    // supplier's purchase orders are not guaranteed to share one currency/rate.
     const totalOwed = orders.reduce(
-      (sum, po) => sum + po.items.reduce((s, item) => s + item.quantity * item.unitPrice, 0),
+      (sum, po) =>
+        sum +
+        toBaseAmount(
+          po.items.reduce((s, item) => s + item.quantity * item.unitPrice, 0),
+          po.exchangeRateToBase,
+        ),
       0,
     );
     return totalOwed - (payments._sum.amount ?? 0);

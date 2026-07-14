@@ -9,6 +9,17 @@ import {
   permissionKey,
   ROLE_PERMISSIONS,
 } from '../src/shared/constants/permissions';
+import { getDemoUserIds } from './seed/helpers';
+import { seedCatalog } from './seed/catalog';
+import { seedSuppliersAndProcurement } from './seed/procurement';
+import { seedShipmentsAndInventory, topUpInventoryTransactions } from './seed/shipmentsInventory';
+import { seedDistributorsAndSales } from './seed/salesDistributors';
+import { seedFinanceAndExpenses } from './seed/financeExpenses';
+import { seedTaxAndSettings } from './seed/taxSettings';
+
+/** Target from project_description.txt's "Demo Data" section — see seed/shipmentsInventory.ts's
+ * topUpInventoryTransactions() for why this is only checked at the very end of the run. */
+const TARGET_INVENTORY_TRANSACTIONS = 1000;
 
 const DEMO_PASSWORD = 'Demo@1234';
 
@@ -80,41 +91,33 @@ async function seedRolesAndUsers() {
   console.log(`  demo login password for all seeded users: ${DEMO_PASSWORD}`);
 }
 
-async function seedCatalog() {
-  // Phase 5: 50 products across categories, with SKU/barcode/reorder levels.
-}
-
-async function seedSuppliersAndProcurement() {
-  // Phase 5: 20 suppliers, 100 purchase orders (+ items, status history, attachments).
-}
-
-async function seedShipmentsAndInventory() {
-  // Phase 5: shipments linked to POs, warehouse(s), inventory lots, 1000 stock transactions.
-}
-
-async function seedDistributorsAndSales() {
-  // Phase 5: 15 distributors, 300 sales orders (+ items, invoices, returns, credit notes).
-}
-
-async function seedFinanceAndExpenses() {
-  // Phase 5: chart of accounts, 12 months of journal entries/expenses/payments reconciled
-  // with sales & purchases so dashboard KPIs are internally consistent.
-}
-
-async function seedTaxAndSettings() {
-  // Phase 5: tax rates, company settings, exchange rates.
-}
-
 async function main() {
   console.log('Seeding database...');
 
   await seedRolesAndUsers();
+
+  const users = await getDemoUserIds();
+
+  console.log('Seeding catalog (categories, warehouses, products)...');
   await seedCatalog();
-  await seedSuppliersAndProcurement();
-  await seedShipmentsAndInventory();
-  await seedDistributorsAndSales();
-  await seedFinanceAndExpenses();
+
+  console.log('Seeding suppliers and purchase orders...');
+  await seedSuppliersAndProcurement(users);
+
+  console.log('Seeding shipments and inventory (goods receipts, adjustments)...');
+  await seedShipmentsAndInventory(users);
+
+  console.log('Seeding distributors and sales orders (invoices, payments, returns)...');
+  await seedDistributorsAndSales(users);
+
+  console.log('Seeding finance and expenses (chart of accounts, journal entries)...');
+  await seedFinanceAndExpenses(users);
+
+  console.log('Seeding tax rates and settings...');
   await seedTaxAndSettings();
+
+  console.log('Topping up inventory transaction volume if needed...');
+  await topUpInventoryTransactions(TARGET_INVENTORY_TRANSACTIONS);
 
   console.log('Seed complete.');
 }

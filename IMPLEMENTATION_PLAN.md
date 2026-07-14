@@ -5,14 +5,43 @@ phases so work can be resumed across sessions. **Update the checkboxes and "Curr
 section below as work progresses** — this file is the source of truth for where we are.
 
 ## Current Status
-- Phase: **3 — In progress.** Suppliers (3.1) through Sales (3.6) done sequentially;
-  Finance (3.7), Expenses (3.8), Tax (3.9), Notifications (3.12), AI (3.13), Settings (3.14)
-  done via 6 parallel background agents, all reviewed/merged/live-verified by me. Only
-  Dashboard (3.10) and Reports (3.11) remain in Phase 3.
+- Phase: **All 10 phases done, with one caveat.** Phases 0-9 are complete: backend (14 modules),
+  integration abstractions, demo data seed, frontend setup/shell, all 14 Phase 8 module pages
+  (Reports/Notifications/AI Dashboard/Settings were the last 4, built 2026-07-14), and Phase 9's
+  PDF/Excel export + print-friendly views. Phase 10 is done except **10.1's responsive pass
+  could not be visually re-verified this session** (no working browser — see the environment
+  note below); everything else (cross-module nav sweep, Jest backend tests, root README, the
+  local-only deployment decision) is complete. **This is very likely demo-ready** — the
+  remaining gap is a nice-to-have visual QA pass, not a functional blocker.
+- **2026-07-14 correction:** this file previously claimed Phase 7 complete / Phase 8 not
+  started, but the actual code on disk showed 10 of 14 Phase 8 module pages already fully
+  built (real list/detail/create/edit views wired to the API, not placeholders) — work done
+  in a separate session that was never reflected here and never committed to git (everything
+  since the initial scaffold commit `b47c6bc` was sitting uncommitted). Lesson: **this file
+  must be updated in the same session the code changes, not left for a later pass** — the
+  gap let a whole session's worth of progress go untracked. Trusting the code over this file
+  (per the "How to resume" section below) is what caught it.
+- **2026-07-14 environment fix:** the project lives on a Windows-mounted path
+  (`/mnt/c/previous_app/Projects/ERP`, a 9p/DrvFs mount under WSL2). Native modules
+  (`better-sqlite3`) had Windows `.node` binaries (from a prior Windows-side `npm install`)
+  instead of Linux ones, and Next.js/Turbopack's dev build cache could not reliably create
+  lockfiles or write chunks on that filesystem (`EIO`/`EPERM` on unlink/utime/lockfile-create;
+  Next itself detected and warned "Slow filesystem... consider moving to a local folder").
+  Fix: a full working copy now lives at `/home/shahbaz/erp-work` (native Linux ext4, includes
+  the seeded `dev.db` and all uncommitted changes), with `node_modules` installed fresh there.
+  All dev/build/test work now happens from that copy; source changes are synced back to
+  `/mnt/c/previous_app/Projects/ERP` periodically (excluding `node_modules`/`.next`/generated
+  Prisma client) so the Windows-visible copy stays current. **Future sessions: prefer working
+  from `/home/shahbaz/erp-work` directly if it still exists and is up to date with the git
+  remote** (check `git log` in both locations); otherwise repeat this copy+install step rather
+  than fighting the DrvFs mount again.
 - Last updated: 2026-07-14
-- Next action: Dashboard (3.10), then Reports (3.11) — sequentially, by me (not parallel
-  agents), since both aggregate across every other module and depend on all of them existing.
-  After that, Phase 3 is complete and Phase 4 (integration abstraction interfaces) begins.
+- A real multi-currency bug was found and fixed in `suppliersRepository.outstandingBalance`/
+  `shared/analytics.ts` (PO totals weren't converted via `exchangeRateToBase` before being
+  summed across suppliers with different currencies) — new `apps/api/src/shared/currency.ts`
+  now holds that conversion helper; any Phase 8 page displaying cross-supplier/distributor
+  totals should double check it's reading already-converted values from the API, not
+  re-summing raw currency fields itself.
 - **Parallel-agent outcome:** the 6-agent batch worked well — all typechecked/linted clean on
   first merge, and the reused-calculation instruction was followed correctly everywhere it
   applied (Finance/receivables-payables verified to match Suppliers/Distributors exactly).
@@ -347,10 +376,9 @@ caught two real issues (below).
       (totalInvoiced × active GST rate); e-invoice endpoint returns a static "not integrated"
       response per the spec's explicit instruction; audit-logs endpoint correctly returns
       empty (nothing writes to `AuditLog` yet — known, separately-tracked gap, not a bug here).
-- [ ] 3.10 Dashboard (aggregated KPIs + chart data endpoints) — NOT part of the parallel
-      batch; depends on every other module's data, must be built last.
-- [ ] 3.11 Reports (sales/purchase/inventory/profit/cash flow/supplier/distributor/expense/tax
-      + PDF/Excel export, print-friendly) — also deferred to last for the same reason.
+- [x] 3.10 Dashboard (aggregated KPIs + chart data endpoints)
+- [x] 3.11 Reports (sales/purchase/inventory/profit/cash flow/supplier/distributor/expense/tax
+      + PDF/Excel export, print-friendly)
 - [x] 3.12 Notifications (center + placeholder channels: email/SMS/WhatsApp/push, reminder +
       alert settings) — **RBAC bug fixed post-merge:** the agent (correctly following the
       general per-module permission-gating instruction it was given) gated list/read/
@@ -379,47 +407,184 @@ caught two real issues (below).
       needing dedicated tables; users/roles listings are read-only (no create/edit — that's
       explicitly out of scope per the task given).
 
-## Phase 4 — Integration Abstraction Layers (interfaces only, no real calls)
-- [ ] 4.1 Define service interfaces + fake/mock implementations for: FBR e-Invoicing,
+## Phase 4 — Integration Abstraction Layers (interfaces only, no real calls) ✅ COMPLETE
+- [x] 4.1 Define service interfaces + fake/mock implementations for: FBR e-Invoicing,
       WhatsApp Business API, SMS Gateway, Email Service, Currency Exchange API,
       AI Forecasting Engine, Cloud Storage (S3), Payment Gateway
-- [ ] 4.2 Local file storage service behind the same interface as future S3 service
+- [x] 4.2 Local file storage service behind the same interface as future S3 service
 
-## Phase 5 — Demo Data Generation
-- [ ] 5.1 Seed script: 50 products, 20 suppliers, 15 distributors
-- [ ] 5.2 Seed script: 100 purchase orders, 300 sales orders, 1000 inventory transactions
-- [ ] 5.3 Seed script: 12 months revenue/expenses/shipments/payments/receipts (consistent with
+## Phase 5 — Demo Data Generation ✅ COMPLETE
+- [x] 5.1 Seed script: 50 products, 20 suppliers, 15 distributors
+- [x] 5.2 Seed script: 100 purchase orders, 300 sales orders, 1000 inventory transactions
+- [x] 5.3 Seed script: 12 months revenue/expenses/shipments/payments/receipts (consistent with
       each other so dashboard KPIs reconcile, not just random noise)
-- [ ] 5.4 Seed users covering all 6 roles with hashed passwords
+- [x] 5.4 Seed users covering all 6 roles with hashed passwords
 
-## Phase 6 — Frontend Setup
-- [ ] 6.1 Next.js + TypeScript app, TailwindCSS, ShadCN UI installed/configured
-- [ ] 6.2 React Query provider, React Hook Form + Zod conventions, Chart.js/Recharts setup
-- [ ] 6.3 Auth flow (login, logout, forgot-password UI, profile, protected routes by role)
+## Phase 6 — Frontend Setup ✅ COMPLETE
+- [x] 6.1 Next.js + TypeScript app, TailwindCSS, ShadCN UI installed/configured — CLI defaults
+      to `base-nova` style / `neutral` base color (grayscale OKLCH), a professional look
+      suited to an admin dashboard; `--base` library is Base UI (`@base-ui/react`), not Radix —
+      polymorphism is a `render` prop, not `asChild` (see Phase 7 notes and `apps/web/README.md`
+      "Next 16 gotchas"). Installed shadcn components: button, input, label, field (the
+      current replacement for the old RHF-bound `form` component, which no longer ships
+      content in this registry), card, table, dropdown-menu, avatar, separator, sheet,
+      tooltip, skeleton, badge, dialog, sonner (toast), select, checkbox, alert, tabs,
+      breadcrumb, scroll-area, popover, textarea, empty, spinner, chart, sidebar.
+- [x] 6.2 React Query provider (`src/lib/query-provider.tsx` — 30s staleTime, no retry on
+      401/403/404, global `QueryCache.onError` clears session + redirects to /login on any
+      401 app-wide), React Hook Form + Zod convention (`src/components/shared/form-fields.tsx`
+      wraps shadcn's `Field` primitive with RHF `Controller`; `src/features/auth/login-form.tsx`
+      is the reference example), Recharts + shadcn chart wrapper (`src/components/shared/
+      chart-card.tsx` — picked Recharts per spec, did not also install Chart.js). Chart/status
+      colors are a validated categorical palette (not shadcn's grayscale chart defaults) —
+      see `globals.css` `--chart-1..8`/`--status-*` and the "Charts & color" section of
+      `apps/web/README.md`.
+- [x] 6.3 Auth flow — `/login`, `/forgot-password` (generic success message for both real and
+      fake emails, matching the backend's mock), `/profile` (read-only, matches `GET
+      /api/auth/me`), logout. Session = a plain (non-httpOnly) `erp_token` cookie set client-side
+      after login (see `apps/web/README.md` "Auth / session model" for the full rationale/
+      tradeoffs) — readable by `src/proxy.ts` (Next 16's renamed `middleware.ts`) for the
+      server-side redirect gate and by `src/lib/api-client.ts` for the `Authorization` header.
+      **Verified live** (Puppeteer against the real Chrome install, not just manual spot-checks):
+      all 6 demo roles log in and land on `/dashboard`; logout clears the session and redirects
+      to `/login`; visiting a protected route while logged out redirects to `/login?from=...`;
+      forgot-password shows the identical generic message for a real vs. fake email.
 
-## Phase 7 — Shared UI / App Shell
-- [ ] 7.1 Left sidebar (module nav, role-aware), top nav, breadcrumbs
-- [ ] 7.2 Reusable components: cards, data table (filter/search/pagination/sort), charts
-      wrapper, form fields, file upload
-- [ ] 7.3 Dark mode support across the shell and components
+## Phase 7 — Shared UI / App Shell ✅ COMPLETE
+- [x] 7.1 Left sidebar (`src/components/layout/app-sidebar.tsx`, shadcn's `Sidebar` primitives,
+      collapsible to icons), top nav (`top-nav.tsx`: sidebar toggle, breadcrumbs, notification
+      bell placeholder, dark-mode toggle, user menu with logout), breadcrumbs
+      (`breadcrumbs.tsx`, auto-derived from the pathname — no per-page config needed). Nav
+      visibility is driven entirely by `src/lib/nav-config.ts`'s `visibleNavItems()` checking
+      `"<module>:view"` against the logged-in user's `permissions` array — **verified live for
+      all 6 demo roles** (Puppeteer: logged in as each, captured the actual rendered sidebar
+      labels via the DOM, and asserted they exactly equal the set of modules the role's real
+      `permissions` from the login response grant `:view` on — all 6 matched exactly, including
+      Executive seeing all 14 and Accountant seeing only Dashboard/Finance/Expenses/Tax/Reports).
+- [x] 7.2 Reusable components under `src/components/shared/`: `stat-card.tsx` (KPI tile),
+      `data-table.tsx` (`@tanstack/react-table` in manual/server-driven mode — sort/search/
+      pagination state lives in the caller's React Query hook, the component only renders),
+      `chart-card.tsx` (Recharts + shadcn chart wrapper with loading/empty states and the
+      validated color palette), `form-fields.tsx` (RHF-bound field wrappers: Text/Textarea/
+      Select/Checkbox), `file-upload.tsx` (drag/drop + click, pre-validates against the
+      backend's multer MIME whitelist + `MAX_UPLOAD_SIZE_MB`, mirrored in
+      `src/lib/upload-constants.ts`), plus `page-header.tsx` and `coming-soon.tsx` for
+      consistent placeholder/page-heading styling. All 14 module routes have a placeholder
+      page using these so the full shell/nav/breadcrumb/RBAC-visibility is click-through-able
+      end-to-end today; Phase 8 replaces each placeholder body only.
+- [x] 7.3 Dark mode: `next-themes`, class strategy, toggle in the top nav (light/dark/system).
+      **Verified live**: toggled dark mode via Puppeteer, confirmed the `dark` class lands on
+      `<html>`, and screenshotted the shell + placeholder pages at 1440px, 1024px (laptop), and
+      834px (tablet) widths in dark mode — legible throughout, sidebar stays fully expanded
+      (icon-collapse is manual via the toggle, not automatic) down to tablet width. Two real
+      bugs were found and fixed during this verification pass (not caught by typecheck/lint —
+      both are documented in `apps/web/README.md`'s "Next 16 gotchas" for Phase 8 agents):
+      1. shadcn's generated `SidebarMenuSkeleton` picked its loading-bar width via
+         `useState(() => Math.random())`, which differs between SSR and client hydration and
+         threw a hydration-mismatch warning on every page load while the sidebar was loading —
+         fixed by making width a prop with a fixed default instead of internal randomness.
+      2. Base UI's `Menu.GroupLabel` (which shadcn's `DropdownMenuLabel` wraps) throws
+         `"MenuGroupContext is missing"` at runtime unless wrapped in `<Menu.Group>` — the user
+         menu's `DropdownMenuLabel` wasn't, so it crashed as soon as the menu opened. Fixed by
+         wrapping it in `DropdownMenuGroup`. This only surfaces at runtime, not typecheck/lint/
+         build, so it needed the live browser pass to catch.
+      After both fixes, a full Puppeteer run across all 6 roles + the dark-mode/logout/
+      forgot-password pass logged zero console errors.
 
 ## Phase 8 — Module Frontend Pages (mirrors Phase 3, module by module)
-- [ ] 8.1 Executive Dashboard (all KPIs + 8 charts listed in spec)
-- [ ] 8.2 Suppliers, Procurement, Shipments, Inventory, Distributors, Sales, Finance,
-      Expenses, Tax & Compliance, Reports, Notifications, AI Dashboard (placeholder), Settings
-      — one sub-step per module, each with list/detail/create/edit views as applicable
+- [x] 8.1 Executive Dashboard (all KPIs + 8 charts listed in spec) — `src/features/dashboard`,
+      `src/app/(app)/dashboard/page.tsx`
+- [x] 8.2 Suppliers — list/profile/create/edit/contacts, `src/features/suppliers`
+- [x] 8.3 Procurement — PO list/detail/create/edit, approval workflow, attachments,
+      `src/features/procurement`
+- [x] 8.4 Shipments — list/detail/create, landed cost, timeline, `src/features/shipments`
+- [x] 8.5 Inventory — products/categories/warehouses/goods-receipt/adjustments/alerts/
+      valuation, `src/features/inventory`
+- [x] 8.6 Distributors — list/profile, pricing groups, `src/features/distributors`
+- [x] 8.7 Sales — orders/invoices/returns, `src/features/sales`
+- [x] 8.8 Finance — accounts/bank accounts/journal entries/reports (P&L, balance sheet, cash
+      flow, receivables, payables), `src/features/finance`
+- [x] 8.9 Expenses — list/detail/create/edit/categories/report, `src/features/expenses`
+- [x] 8.10 Tax & Compliance — tax rates, e-invoice screen, compliance dashboard, audit logs,
+      `src/features/tax`
+- [x] 8.11 Reports — 9 nested routes under `/reports/*` (sales/purchases/inventory/profit/
+      cash-flow/suppliers/distributors/expenses/tax) + an overview hub, `src/features/reports`.
+      Sales/purchase reports come back as `{ rows, summary }` (not the standard paginated
+      envelope) — `reportsApi.sales/purchases` use plain `apiClient.get` and read
+      `summary.orderCount` as the row-count total, not `apiClient.getPaginated`. Each view has
+      an `Export PDF` / `Export Excel` / `Print` toolbar (Phase 9, see below).
+- [x] 8.12 Notifications — notification center (list/unread-count/mark-read/mark-all-read,
+      no permission gate beyond ownership — see Phase 3.12) + email/SMS/WhatsApp/push
+      placeholder cards + reminder/alert settings (generic system-settings keys,
+      `notifications.reminderSettings`/`notifications.alertSettings`), `src/features/notifications`.
+      The previously-static top-nav `notification-bell.tsx` is now wired to real unread-count/
+      list data.
+- [x] 8.13 AI Dashboard — demand forecast/seasonal analysis/import recommendation/predictive
+      charts (demo-generated, each visibly badged "Demo data — not real AI") + best-selling-
+      products/slow-moving-inventory (real aggregations, no badge) — a page-level `Alert`
+      states plainly that no real AI is integrated, per the spec's explicit instruction.
+      `src/features/ai`.
+- [x] 8.14 Settings — company info/currency (`/settings/company`), exchange rates (full CRUD),
+      users (read-only), roles+permissions (read-only, grouped by module), tax/email/
+      notification/backup settings (generic system-settings keys under `settings.*`), system
+      logs (read-only, empty by design — nothing writes to `AuditLog` yet, a known
+      separately-tracked gap from Phase 3.9). `src/features/settings`. Every create/edit/
+      delete affordance gated on `settings:create`/`edit`/`delete` (Super Admin only; Executive
+      is view-only).
+- **2026-07-14: all 4 remaining modules built via 3 parallel background agents** (Reports done
+  directly, not delegated, since Phase 9's export work touches it too) — same pattern the prior
+  session used for Phase 3's 3.7/3.8/3.9/3.12/3.13/3.14 batch. All merged cleanly: whole-repo
+  `tsc --noEmit` and `next lint` both clean (only the same 8 pre-existing RHF `watch()` compiler
+  warnings), and a full `next build` succeeded across all 66 routes.
 
-## Phase 9 — Reports Output
-- [ ] 9.1 PDF export
-- [ ] 9.2 Excel export
-- [ ] 9.3 Print-friendly views
+## Phase 9 — Reports Output ✅ COMPLETE
+- [x] 9.1 PDF export — `apps/api/src/modules/reports/export.util.ts` (`pdfkit`) + per-report
+      column definitions in `export-columns.ts`. Every `/api/reports/*` GET accepts
+      `?format=pdf`, reusing the exact same route/auth/`reports:view` gate as the JSON response
+      — no new endpoints.
+- [x] 9.2 Excel export — same file, `exceljs`, `?format=excel`, `.xlsx` streamed with
+      `Content-Disposition: attachment`.
+- [x] 9.3 Print-friendly views — client-side only (`window.print()` + Tailwind `print:hidden`
+      on the sidebar/top-nav/filters/toolbar), no server work needed; `ReportsPageShell`/
+      `ReportToolbar` in `src/features/reports` apply it.
+- Verified live: curled all 9 report types in both `pdf` and `excel` formats with a real JWT —
+  `file` confirms genuine `PDF document`/`Microsoft Excel 2007+` outputs, not empty/corrupt
+  files, for both date-ranged and non-date-ranged reports.
 
 ## Phase 10 — Polish & Demo Readiness
-- [ ] 10.1 Responsive pass (desktop-first, but usable on tablet/laptop widths)
-- [ ] 10.2 Cross-module navigation/consistency check
-- [ ] 10.3 Basic backend tests (auth, sales, inventory happy paths)
-- [ ] 10.4 README with setup instructions (docker up, migrate, seed, run web+api)
-- [ ] 10.5 Decide + set up demo deployment target (see Gap #11) if the client needs a live link
+- [~] 10.1 Responsive pass — the 4 new modules (Reports/Notifications/AI/Settings) use the same
+      `sm:`/`lg:` Tailwind responsive grid/flex classes as every existing module (15 files
+      checked); **not re-verified visually at tablet/laptop widths this session** — no working
+      Chrome/browser was available in this environment (see the environment-fix note above;
+      Puppeteer's bundled Chromium needs `libnspr4`/`libnss3`/`libasound.so.2` which require
+      root to install and weren't available). A future session with browser access should
+      re-run the same Puppeteer screenshot pass Phase 7 did (1440/1024/834px) across the 4 new
+      modules specifically.
+- [x] 10.2 Cross-module navigation/consistency check — curled all 14 module routes + `/profile`
+      for all 6 demo roles (84 requests) via a valid session cookie: all 200, no error markers
+      in the rendered HTML. Confirmed sidebar-hidden pages (e.g. `/ai`, `/settings` for roles
+      without `ai:view`/`settings:view`) still render without crashing when reached directly by
+      URL — client queries degrade to empty states (`data ?? []`), not a thrown error, matching
+      the existing app's "nav visibility is the only real gate" pattern from Phase 7.
+- [x] 10.3 Basic backend tests — Jest + Supertest added to `apps/api` (`apps/api/test/`,
+      `jest.config.js`, `test/jest.setup.ts` for a dedicated `test.db` isolated from the seeded
+      `dev.db`, `test/helpers.ts` for a full-permission RBAC fixture). 15 tests across 3 files,
+      all passing: `auth.test.ts` (login success/wrong-password/malformed-body/`/me` with-and-
+      without-token/forgot-password generic message), `inventory.test.ts` (create category/
+      warehouse/product, duplicate-SKU 409, goods receipt → stock-on-hand, FIFO decrease →
+      low-stock flag → low-stock alert list), `sales.test.ts` (create DRAFT order → confirm
+      consumes stock → re-confirm rejected 400 → cancel restores stock). Run via
+      `npm test --workspace=apps/api`. Not exhaustive (per the original Gap #2 scope) — happy
+      paths only, no negative-path coverage beyond what's listed above.
+- [x] 10.4 README with setup instructions — root `README.md` added (stack overview, prereqs
+      including the WSL/DrvFs native-filesystem warning this session hit, `npm install` →
+      migrate → seed → `dev:api`/`dev:web` steps, demo logins table, common commands, project
+      structure, deployment note, known demo limitations). `apps/web/README.md` already existed
+      with frontend-specific conventions.
+- [x] 10.5 Demo deployment target — **decided 2026-07-14 (re-confirmed, see Current Status
+      history above): local-only.** No hosted deploy link, Dockerfile, or CI pipeline for this
+      demo; documented in the root README's "Deployment" section. `docker-compose.yml` stays at
+      the root for a future real-Postgres swap only.
 
 ---
 
