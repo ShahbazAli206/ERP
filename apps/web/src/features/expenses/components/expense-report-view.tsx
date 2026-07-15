@@ -12,17 +12,17 @@ import { ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/component
 import { WalletIcon } from 'lucide-react';
 import { ExpensesSubNav } from './expenses-nav';
 import { useExpenseReport } from '../hooks';
-import { formatMoney } from '../format';
+import { formatMoney, toLocalDateInputValue } from '../format';
 
-/** First day of the current month, as `YYYY-MM-DD`. */
+/** First day of the current month, as `YYYY-MM-DD` (local calendar, not UTC — see `toLocalDateInputValue`). */
 function startOfMonth(): string {
   const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+  return toLocalDateInputValue(new Date(now.getFullYear(), now.getMonth(), 1));
 }
 
-/** Today, as `YYYY-MM-DD`. */
+/** Today, as `YYYY-MM-DD` (local calendar, not UTC). */
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toLocalDateInputValue(new Date());
 }
 
 const reportChartConfig = { total: { label: 'Total spent', color: 'var(--chart-1)' } } satisfies ChartConfig;

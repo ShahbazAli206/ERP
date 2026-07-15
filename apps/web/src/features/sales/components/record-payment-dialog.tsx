@@ -60,7 +60,19 @@ export function RecordPaymentDialog({
       onOpenChange={(next) => {
         if (isPending) return;
         setOpen(next);
-        if (!next) {
+        if (next) {
+          // `useForm`'s `defaultValues` are only applied once at mount, so re-opening this
+          // same dialog instance after a prior payment (which changes `balanceDue` via props)
+          // would otherwise keep prefilling the amount from the *first* time it opened. Reset
+          // explicitly to the current balance whenever it opens.
+          form.reset({
+            amount: balanceDue > 0 ? String(balanceDue.toFixed(2)) : '',
+            method: 'BANK_TRANSFER',
+            paymentDate: '',
+            reference: '',
+          });
+          setErrorMessage(null);
+        } else {
           form.reset();
           setErrorMessage(null);
         }

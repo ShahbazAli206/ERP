@@ -8,11 +8,8 @@ import { FieldGroup } from '@/components/ui/field';
 import { SelectFormField, TextFormField, TextareaFormField } from '@/components/shared/form-fields';
 import { useExpenseCategories } from '../hooks';
 import { expenseFormSchema, type ExpenseFormValues } from '../schemas';
+import { toLocalDateInputValue } from '../format';
 import type { ExpenseDetail } from '../api';
-
-function todayIsoDate(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 /** Shared create/edit form for a single expense. Attachments are managed separately on the expense detail page, once it exists (mirrors Procurement's PO create/edit + attachments-on-detail-page split). */
 export function ExpenseForm({
@@ -41,7 +38,7 @@ export function ExpenseForm({
       : {
           categoryId: '',
           amount: '',
-          expenseDate: todayIsoDate(),
+          expenseDate: toLocalDateInputValue(new Date()),
           description: '',
         },
   });
