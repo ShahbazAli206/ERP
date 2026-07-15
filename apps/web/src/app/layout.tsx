@@ -46,6 +46,15 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        {/* Restores the saved accent-color theme before paint, same idea as next-themes' own
+            blocking script — avoids a flash of the default (violet) accent for users who picked
+            a different one. Static string, no user input, safe to inline. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var a=localStorage.getItem('erp-accent');if(a&&a!=='violet')document.documentElement.setAttribute('data-accent',a);}catch(e){}",
+          }}
+        />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <QueryProvider>
             <TooltipProvider>

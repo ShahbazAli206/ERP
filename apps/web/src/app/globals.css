@@ -18,6 +18,9 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-brand-1: var(--brand-1);
+  --color-brand-2: var(--brand-2);
+  --color-brand-3: var(--brand-3);
   --color-chart-8: var(--chart-8);
   --color-chart-7: var(--chart-7);
   --color-chart-6: var(--chart-6);
@@ -52,24 +55,29 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: oklch(0.985 0.006 285);
+  --foreground: oklch(0.2 0.02 285);
+  --card: oklch(1 0 0 / 78%);
+  --card-foreground: oklch(0.2 0.02 285);
+  --popover: oklch(1 0 0 / 96%);
+  --popover-foreground: oklch(0.2 0.02 285);
+  --primary: oklch(0.556 0.221 264);
+  --primary-foreground: oklch(0.99 0.01 264);
+  --secondary: oklch(0.95 0.03 285);
+  --secondary-foreground: oklch(0.32 0.08 285);
+  --muted: oklch(0.955 0.015 285);
+  --muted-foreground: oklch(0.5 0.03 285);
+  --accent: oklch(0.94 0.06 300);
+  --accent-foreground: oklch(0.32 0.12 300);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.9 0.02 285);
+  --input: oklch(0.92 0.015 285);
+  --ring: oklch(0.63 0.19 264);
+  /* Brand gradient stops — used by .bg-gradient-brand / glow shadows / the
+     accent theme picker. Swapped per [data-accent] preset below. */
+  --brand-1: oklch(0.6 0.22 264);
+  --brand-2: oklch(0.62 0.24 300);
+  --brand-3: oklch(0.68 0.19 200);
   /* Categorical chart palette — validated (colorblind-safe, WCAG-checked)
      via the dataviz skill's palette + validator; do not eyeball-replace
      these. See src/components/shared/chart-card.tsx for usage docs. */
@@ -88,36 +96,48 @@
   --status-warning: #fab219;
   --status-serious: #ec835a;
   --status-critical: #d03b3b;
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Decorative icon-badge accents (StatCard, module empty-states, etc).
+     Purely cosmetic — never used to encode data, so kept separate from the
+     chart-1..8 palette. Cycle through by index, not by meaning. */
+  --icon-a: oklch(0.58 0.2 264);
+  --icon-b: oklch(0.62 0.19 320);
+  --icon-c: oklch(0.65 0.17 25);
+  --icon-d: oklch(0.68 0.16 75);
+  --icon-e: oklch(0.62 0.14 175);
+  --icon-f: oklch(0.6 0.19 230);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.99 0.008 285 / 75%);
+  --sidebar-foreground: oklch(0.25 0.03 285);
+  --sidebar-primary: oklch(0.556 0.221 264);
+  --sidebar-primary-foreground: oklch(0.99 0.01 264);
+  --sidebar-accent: oklch(0.92 0.05 280 / 70%);
+  --sidebar-accent-foreground: oklch(0.35 0.15 280);
+  --sidebar-border: oklch(0.9 0.02 285 / 60%);
+  --sidebar-ring: oklch(0.63 0.19 264);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.16 0.025 280);
+  --foreground: oklch(0.96 0.01 280);
+  --card: oklch(0.24 0.03 280 / 55%);
+  --card-foreground: oklch(0.96 0.01 280);
+  --popover: oklch(0.2 0.03 280 / 95%);
+  --popover-foreground: oklch(0.96 0.01 280);
+  --primary: oklch(0.72 0.19 264);
+  --primary-foreground: oklch(0.14 0.03 280);
+  --secondary: oklch(0.3 0.035 280);
+  --secondary-foreground: oklch(0.94 0.02 280);
+  --muted: oklch(0.27 0.03 280);
+  --muted-foreground: oklch(0.72 0.03 280);
+  --accent: oklch(0.34 0.09 300);
+  --accent-foreground: oklch(0.94 0.03 300);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.72 0.19 264);
+  --brand-1: oklch(0.7 0.2 264);
+  --brand-2: oklch(0.72 0.22 300);
+  --brand-3: oklch(0.75 0.17 200);
   /* Dark-mode steps of the same categorical palette (own validated set, not an auto-flip). */
   --chart-1: #3987e5; /* blue */
   --chart-2: #199e70; /* aqua */
@@ -132,14 +152,107 @@
   --status-warning: #fab219;
   --status-serious: #ec835a;
   --status-critical: #d03b3b;
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --icon-a: oklch(0.7 0.19 264);
+  --icon-b: oklch(0.72 0.18 320);
+  --icon-c: oklch(0.74 0.17 25);
+  --icon-d: oklch(0.78 0.15 75);
+  --icon-e: oklch(0.72 0.14 175);
+  --icon-f: oklch(0.7 0.18 230);
+  --sidebar: oklch(0.2 0.03 280 / 65%);
+  --sidebar-foreground: oklch(0.94 0.02 280);
+  --sidebar-primary: oklch(0.72 0.19 264);
+  --sidebar-primary-foreground: oklch(0.14 0.03 280);
+  --sidebar-accent: oklch(0.34 0.08 280 / 70%);
+  --sidebar-accent-foreground: oklch(0.94 0.04 280);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.72 0.19 264);
+}
+
+/* --- Accent theme presets ---------------------------------------------- *
+ * Swap the brand hue app-wide via `document.documentElement.dataset.accent`
+ * (persisted to localStorage by the theme picker in top-nav). Each preset
+ * only overrides the hue-bearing tokens — lightness/chroma structure and
+ * every grayscale/chart/status token stay exactly as set above.
+ */
+[data-accent="emerald"] {
+  --primary: oklch(0.6 0.16 155);
+  --ring: oklch(0.63 0.15 155);
+  --accent: oklch(0.93 0.07 155);
+  --accent-foreground: oklch(0.3 0.1 155);
+  --brand-1: oklch(0.62 0.17 155);
+  --brand-2: oklch(0.68 0.16 175);
+  --brand-3: oklch(0.75 0.18 130);
+  --sidebar-primary: oklch(0.6 0.16 155);
+  --sidebar-ring: oklch(0.63 0.15 155);
+  --sidebar-accent: oklch(0.92 0.06 155 / 70%);
+  --sidebar-accent-foreground: oklch(0.32 0.12 155);
+}
+.dark[data-accent="emerald"] {
+  --primary: oklch(0.74 0.16 155);
+  --ring: oklch(0.74 0.16 155);
+  --accent: oklch(0.34 0.08 155);
+  --accent-foreground: oklch(0.94 0.04 155);
+  --brand-1: oklch(0.72 0.17 155);
+  --brand-2: oklch(0.75 0.16 175);
+  --brand-3: oklch(0.8 0.18 130);
+  --sidebar-primary: oklch(0.74 0.16 155);
+  --sidebar-ring: oklch(0.74 0.16 155);
+  --sidebar-accent: oklch(0.34 0.08 155 / 70%);
+  --sidebar-accent-foreground: oklch(0.94 0.04 155);
+}
+
+[data-accent="rose"] {
+  --primary: oklch(0.6 0.22 15);
+  --ring: oklch(0.63 0.2 15);
+  --accent: oklch(0.93 0.06 15);
+  --accent-foreground: oklch(0.32 0.13 15);
+  --brand-1: oklch(0.62 0.22 15);
+  --brand-2: oklch(0.65 0.24 350);
+  --brand-3: oklch(0.72 0.19 40);
+  --sidebar-primary: oklch(0.6 0.22 15);
+  --sidebar-ring: oklch(0.63 0.2 15);
+  --sidebar-accent: oklch(0.92 0.06 15 / 70%);
+  --sidebar-accent-foreground: oklch(0.34 0.14 15);
+}
+.dark[data-accent="rose"] {
+  --primary: oklch(0.72 0.19 15);
+  --ring: oklch(0.72 0.19 15);
+  --accent: oklch(0.34 0.09 15);
+  --accent-foreground: oklch(0.94 0.04 15);
+  --brand-1: oklch(0.72 0.2 15);
+  --brand-2: oklch(0.72 0.22 350);
+  --brand-3: oklch(0.78 0.17 40);
+  --sidebar-primary: oklch(0.72 0.19 15);
+  --sidebar-ring: oklch(0.72 0.19 15);
+  --sidebar-accent: oklch(0.34 0.09 15 / 70%);
+  --sidebar-accent-foreground: oklch(0.94 0.04 15);
+}
+
+[data-accent="amber"] {
+  --primary: oklch(0.68 0.17 70);
+  --ring: oklch(0.68 0.16 70);
+  --accent: oklch(0.93 0.07 80);
+  --accent-foreground: oklch(0.34 0.1 70);
+  --brand-1: oklch(0.7 0.17 70);
+  --brand-2: oklch(0.68 0.2 40);
+  --brand-3: oklch(0.78 0.16 100);
+  --sidebar-primary: oklch(0.68 0.17 70);
+  --sidebar-ring: oklch(0.68 0.16 70);
+  --sidebar-accent: oklch(0.92 0.07 80 / 70%);
+  --sidebar-accent-foreground: oklch(0.36 0.11 70);
+}
+.dark[data-accent="amber"] {
+  --primary: oklch(0.76 0.16 75);
+  --ring: oklch(0.76 0.16 75);
+  --accent: oklch(0.36 0.08 75);
+  --accent-foreground: oklch(0.95 0.05 75);
+  --brand-1: oklch(0.76 0.16 75);
+  --brand-2: oklch(0.72 0.19 45);
+  --brand-3: oklch(0.82 0.15 105);
+  --sidebar-primary: oklch(0.76 0.16 75);
+  --sidebar-ring: oklch(0.76 0.16 75);
+  --sidebar-accent: oklch(0.36 0.08 75 / 70%);
+  --sidebar-accent-foreground: oklch(0.95 0.05 75);
 }
 
 @layer base {
@@ -151,5 +264,145 @@
   }
   html {
     @apply font-sans;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--primary), transparent 65%);
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--foreground), transparent 85%);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklch, var(--foreground), transparent 70%);
+    background-clip: padding-box;
+  }
+}
+
+@layer utilities {
+  /* Frosted-glass surface — the default look for Card, the sidebar, the
+     top nav, and the auth shell. Needs a colorful backdrop behind it (see
+     `.app-backdrop` / `.auth-backdrop`) to actually read as "glass" rather
+     than plain translucency. */
+  .glass {
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+  }
+  .glass-sm {
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+  }
+
+  .bg-gradient-brand {
+    background-image: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+  }
+  .text-gradient-brand {
+    background-image: linear-gradient(135deg, var(--brand-1), var(--brand-2) 60%, var(--brand-3));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .ring-glow {
+    box-shadow:
+      0 0 0 1px color-mix(in oklch, var(--brand-1), transparent 70%),
+      0 8px 30px -8px color-mix(in oklch, var(--brand-1), transparent 45%);
+  }
+  .hover-lift {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px -16px color-mix(in oklch, var(--brand-1), transparent 55%);
+  }
+
+  /* Decorative animated mesh behind the app shell / auth pages — fixed,
+     pointer-events-none, low-opacity blurred color blobs that drift slowly.
+     Respects reduced-motion (see media query below). */
+  .app-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .app-backdrop::before,
+  .app-backdrop::after {
+    content: "";
+    position: absolute;
+    width: 42rem;
+    height: 42rem;
+    border-radius: 9999px;
+    filter: blur(90px);
+    opacity: 0.35;
+    background: var(--brand-1);
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  .app-backdrop::before {
+    top: -14rem;
+    left: -10rem;
+    background: var(--brand-1);
+  }
+  .app-backdrop::after {
+    bottom: -16rem;
+    right: -12rem;
+    background: var(--brand-2);
+    animation-delay: -8s;
+  }
+  .dark .app-backdrop::before,
+  .dark .app-backdrop::after {
+    opacity: 0.22;
+  }
+
+  .auth-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--background);
+  }
+  .auth-backdrop span {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(80px);
+    opacity: 0.4;
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  .dark .auth-backdrop span {
+    opacity: 0.28;
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(4%, 6%) scale(1.08);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-backdrop::before,
+  .app-backdrop::after,
+  .auth-backdrop span {
+    animation: none;
   }
 }

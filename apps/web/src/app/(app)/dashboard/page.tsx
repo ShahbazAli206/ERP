@@ -5,11 +5,14 @@ import {
   AlertTriangleIcon,
   ArrowDownToLineIcon,
   ArrowUpFromLineIcon,
+  Building2Icon,
   BoxesIcon,
   ClipboardListIcon,
   DollarSignIcon,
   PiggyBankIcon,
+  StoreIcon,
   TrendingUpIcon,
+  TrophyIcon,
   TruckIcon,
   WalletIcon,
 } from 'lucide-react';
@@ -27,6 +30,7 @@ import {
 import { PageHeader } from '@/components/shared/page-header';
 import { StatCard } from '@/components/shared/stat-card';
 import { ChartCard } from '@/components/shared/chart-card';
+import { Carousel } from '@/components/shared/carousel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -184,6 +188,39 @@ function rankedConfig(label: string): ChartConfig {
 
 const unitsFormatter = (v: number) => `${v.toLocaleString()} units`;
 
+/** One slide of the Dashboard's "Highlights" carousel — a colorful spotlight callout, not a data-comparison chart. */
+function SpotlightCard({
+  icon: Icon,
+  label,
+  value,
+  subtitle,
+  gradient,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  subtitle: string;
+  gradient: string;
+}) {
+  return (
+    <div
+      className="hover-lift flex h-full flex-col justify-between gap-4 overflow-hidden rounded-xl p-5 text-white shadow-md"
+      style={{ backgroundImage: gradient }}
+    >
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium tracking-wide text-white/80 uppercase">{label}</span>
+        <span className="flex size-8 items-center justify-center rounded-lg bg-white/15">
+          <Icon className="size-4" />
+        </span>
+      </div>
+      <div className="space-y-1">
+        <p className="truncate text-xl font-semibold">{value}</p>
+        <p className="truncate text-xs text-white/75">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
 /** Fixed (non-index) keys for the recent-activities loading skeleton rows. */
 const SKELETON_ROW_IDS = ['a', 'b', 'c', 'd', 'e', 'f'] as const;
 
@@ -224,9 +261,44 @@ export default function DashboardPage() {
   const emptyMessageFor = (isError: boolean) =>
     isError ? "Couldn't load this chart. Try refreshing the page." : 'No data to display yet.';
 
+  const highlightSlides = [
+    kpisQuery.data && {
+      icon: TrendingUpIcon,
+      label: 'Net Profit',
+      value: formatCurrencyCompact(kpisQuery.data.netProfit),
+      subtitle: 'Trailing 12 months',
+      gradient: 'linear-gradient(135deg, var(--icon-a), var(--icon-f))',
+    },
+    topProductsData[0] && {
+      icon: TrophyIcon,
+      label: 'Top Product',
+      value: topProductsData[0].name,
+      subtitle: unitsFormatter(topProductsData[0].value),
+      gradient: 'linear-gradient(135deg, var(--icon-b), var(--icon-c))',
+    },
+    topSuppliersData[0] && {
+      icon: StoreIcon,
+      label: 'Top Supplier',
+      value: topSuppliersData[0].name,
+      subtitle: `${formatCurrencyCompact(topSuppliersData[0].value)} committed`,
+      gradient: 'linear-gradient(135deg, var(--icon-e), var(--icon-a))',
+    },
+    distributorData[0] && {
+      icon: Building2Icon,
+      label: 'Top Distributor',
+      value: distributorData[0].name,
+      subtitle: `${formatCurrencyCompact(distributorData[0].value)} committed`,
+      gradient: 'linear-gradient(135deg, var(--icon-d), var(--icon-b))',
+    },
+  ].filter((slide): slide is NonNullable<typeof slide> => Boolean(slide));
+
   return (
     <>
       <PageHeader title="Dashboard" description="Executive KPIs and cross-module charts at a glance." />
+
+      {highlightSlides.length > 0 && (
+        <Carousel slides={highlightSlides.map((slide, i) => <SpotlightCard key={i} {...slide} />)} />
+      )}
 
       {kpisQuery.isError && (
         <Alert variant="destructive">

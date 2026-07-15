@@ -17,6 +17,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
+      <div className="app-backdrop" aria-hidden />
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
