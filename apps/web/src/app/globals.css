@@ -106,14 +106,16 @@
   --icon-e: oklch(0.62 0.14 175);
   --icon-f: oklch(0.6 0.19 230);
   --radius: 0.75rem;
-  --sidebar: oklch(0.99 0.008 285 / 75%);
-  --sidebar-foreground: oklch(0.25 0.03 285);
-  --sidebar-primary: oklch(0.556 0.221 264);
+  /* Sidebar — rich deep indigo, stays dark in both light & dark themes for a
+     professional "dark rail" look common in enterprise dashboards. */
+  --sidebar: oklch(0.18 0.055 268);
+  --sidebar-foreground: oklch(0.88 0.025 268);
+  --sidebar-primary: oklch(0.72 0.2 264);
   --sidebar-primary-foreground: oklch(0.99 0.01 264);
-  --sidebar-accent: oklch(0.92 0.05 280 / 70%);
-  --sidebar-accent-foreground: oklch(0.35 0.15 280);
-  --sidebar-border: oklch(0.9 0.02 285 / 60%);
-  --sidebar-ring: oklch(0.63 0.19 264);
+  --sidebar-accent: oklch(0.28 0.075 268 / 90%);
+  --sidebar-accent-foreground: oklch(0.96 0.03 264);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.72 0.2 264);
 }
 
 .dark {
@@ -158,12 +160,13 @@
   --icon-d: oklch(0.78 0.15 75);
   --icon-e: oklch(0.72 0.14 175);
   --icon-f: oklch(0.7 0.18 230);
-  --sidebar: oklch(0.2 0.03 280 / 65%);
-  --sidebar-foreground: oklch(0.94 0.02 280);
+  /* Sidebar dark mode — slightly deeper than light for added depth. */
+  --sidebar: oklch(0.13 0.04 270);
+  --sidebar-foreground: oklch(0.88 0.025 270);
   --sidebar-primary: oklch(0.72 0.19 264);
-  --sidebar-primary-foreground: oklch(0.14 0.03 280);
-  --sidebar-accent: oklch(0.34 0.08 280 / 70%);
-  --sidebar-accent-foreground: oklch(0.94 0.04 280);
+  --sidebar-primary-foreground: oklch(0.99 0.01 264);
+  --sidebar-accent: oklch(0.23 0.065 270 / 90%);
+  --sidebar-accent-foreground: oklch(0.96 0.03 264);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.72 0.19 264);
 }
@@ -182,10 +185,11 @@
   --brand-1: oklch(0.62 0.17 155);
   --brand-2: oklch(0.68 0.16 175);
   --brand-3: oklch(0.75 0.18 130);
-  --sidebar-primary: oklch(0.6 0.16 155);
-  --sidebar-ring: oklch(0.63 0.15 155);
-  --sidebar-accent: oklch(0.92 0.06 155 / 70%);
-  --sidebar-accent-foreground: oklch(0.32 0.12 155);
+  /* Sidebar stays dark — only the active-item highlight colour changes */
+  --sidebar-primary: oklch(0.7 0.18 155);
+  --sidebar-ring: oklch(0.7 0.18 155);
+  --sidebar-accent: oklch(0.28 0.075 268 / 90%);
+  --sidebar-accent-foreground: oklch(0.96 0.03 155);
 }
 .dark[data-accent="emerald"] {
   --primary: oklch(0.74 0.16 155);
@@ -209,10 +213,11 @@
   --brand-1: oklch(0.62 0.22 15);
   --brand-2: oklch(0.65 0.24 350);
   --brand-3: oklch(0.72 0.19 40);
-  --sidebar-primary: oklch(0.6 0.22 15);
-  --sidebar-ring: oklch(0.63 0.2 15);
-  --sidebar-accent: oklch(0.92 0.06 15 / 70%);
-  --sidebar-accent-foreground: oklch(0.34 0.14 15);
+  /* Sidebar stays dark — only active-item highlight changes */
+  --sidebar-primary: oklch(0.72 0.22 15);
+  --sidebar-ring: oklch(0.72 0.22 15);
+  --sidebar-accent: oklch(0.28 0.075 268 / 90%);
+  --sidebar-accent-foreground: oklch(0.96 0.03 15);
 }
 .dark[data-accent="rose"] {
   --primary: oklch(0.72 0.19 15);
@@ -236,10 +241,11 @@
   --brand-1: oklch(0.7 0.17 70);
   --brand-2: oklch(0.68 0.2 40);
   --brand-3: oklch(0.78 0.16 100);
-  --sidebar-primary: oklch(0.68 0.17 70);
-  --sidebar-ring: oklch(0.68 0.16 70);
-  --sidebar-accent: oklch(0.92 0.07 80 / 70%);
-  --sidebar-accent-foreground: oklch(0.36 0.11 70);
+  /* Sidebar stays dark — only active-item highlight changes */
+  --sidebar-primary: oklch(0.76 0.17 70);
+  --sidebar-ring: oklch(0.76 0.17 70);
+  --sidebar-accent: oklch(0.28 0.075 268 / 90%);
+  --sidebar-accent-foreground: oklch(0.96 0.04 70);
 }
 .dark[data-accent="amber"] {
   --primary: oklch(0.76 0.16 75);
@@ -404,5 +410,64 @@
   .app-backdrop::after,
   .auth-backdrop span {
     animation: none;
+  }
+}
+
+/* ── Table enhancements ──────────────────────────────────────────────────── *
+ * Applied by the shared DataTable / table.tsx — gives every module list view
+ * a colorful header row, striped body rows, and an expressive hover state.  */
+@layer utilities {
+  /* Gradient table-header background — applied to <thead> */
+  .table-head-gradient {
+    background: linear-gradient(
+      100deg,
+      color-mix(in oklch, var(--primary), transparent 88%),
+      color-mix(in oklch, var(--brand-2), transparent 92%) 60%,
+      transparent
+    );
+  }
+  /* Odd-row tint for striped tables — applied to <tbody tr:nth-child(odd)> */
+  .table-row-stripe {
+    background: color-mix(in oklch, var(--primary), transparent 97%);
+  }
+  /* Hover row highlight */
+  .table-row-hover:hover {
+    background: color-mix(in oklch, var(--primary), transparent 93%);
+  }
+
+  /* ── Filter / toolbar bar ─────────────────────────────────────────────── */
+  /* Wrap your filter inputs, date pickers, and action buttons inside this
+     to get a consistent styled toolbar across all module pages. */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid color-mix(in oklch, var(--border), transparent 30%);
+    background: color-mix(in oklch, var(--card), transparent 20%);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    box-shadow: 0 1px 6px -2px color-mix(in oklch, var(--primary), transparent 85%);
+  }
+
+  /* Glow pulse for the sidebar active item */
+  .sidebar-item-glow {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklch, var(--sidebar-primary), transparent 55%),
+      0 4px 16px -6px color-mix(in oklch, var(--sidebar-primary), transparent 45%);
+  }
+
+  /* Gradient left accent bar on active sidebar items */
+  .sidebar-active-bar::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 15%;
+    bottom: 15%;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: linear-gradient(to bottom, var(--sidebar-primary), var(--brand-2));
   }
 }

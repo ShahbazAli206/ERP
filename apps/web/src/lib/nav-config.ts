@@ -1,19 +1,19 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  LayoutDashboard,
-  Truck,
-  ShoppingCart,
-  Ship,
-  Boxes,
-  Building2,
-  Receipt,
-  Landmark,
-  Wallet,
-  Scale,
-  BarChart3,
-  Bell,
-  Sparkles,
-  Settings,
+  Globe2,        // Dashboard — worldwide ERP view
+  Factory,       // Suppliers — manufacturing source
+  PackageSearch, // Procurement — searching/ordering goods
+  Plane,         // Shipments — global cargo transit
+  Warehouse,     // Inventory — warehouse stock management
+  Network,       // Distributors — distribution network
+  TrendingUp,    // Sales — revenue growth
+  CircleDollarSign, // Finance — monetary management
+  CreditCard,    // Expenses — spending tracking
+  FileCheck2,    // Tax & Compliance — regulatory filing
+  LineChart,     // Reports — analytics & insights
+  BellRing,      // Notifications — active alerts
+  Brain,         // AI Dashboard — intelligent analytics
+  SlidersHorizontal, // Settings — system configuration
 } from 'lucide-react';
 
 /**
@@ -40,20 +40,20 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', module: 'dashboard', icon: LayoutDashboard },
-  { label: 'Suppliers', href: '/suppliers', module: 'suppliers', icon: Truck },
-  { label: 'Procurement', href: '/procurement', module: 'procurement', icon: ShoppingCart },
-  { label: 'Shipments', href: '/shipments', module: 'shipments', icon: Ship },
-  { label: 'Inventory', href: '/inventory', module: 'inventory', icon: Boxes },
-  { label: 'Distributors', href: '/distributors', module: 'distributors', icon: Building2 },
-  { label: 'Sales', href: '/sales', module: 'sales', icon: Receipt },
-  { label: 'Finance', href: '/finance', module: 'finance', icon: Landmark },
-  { label: 'Expenses', href: '/expenses', module: 'expenses', icon: Wallet },
-  { label: 'Tax & Compliance', href: '/tax', module: 'tax', icon: Scale },
-  { label: 'Reports', href: '/reports', module: 'reports', icon: BarChart3 },
-  { label: 'Notifications', href: '/notifications', module: 'notifications', icon: Bell },
-  { label: 'AI Dashboard', href: '/ai', module: 'ai', icon: Sparkles },
-  { label: 'Settings', href: '/settings', module: 'settings', icon: Settings },
+  { label: 'Dashboard',       href: '/dashboard',     module: 'dashboard',     icon: Globe2 },
+  { label: 'Suppliers',       href: '/suppliers',     module: 'suppliers',     icon: Factory },
+  { label: 'Procurement',     href: '/procurement',   module: 'procurement',   icon: PackageSearch },
+  { label: 'Shipments',       href: '/shipments',     module: 'shipments',     icon: Plane },
+  { label: 'Inventory',       href: '/inventory',     module: 'inventory',     icon: Warehouse },
+  { label: 'Distributors',    href: '/distributors',  module: 'distributors',  icon: Network },
+  { label: 'Sales',           href: '/sales',         module: 'sales',         icon: TrendingUp },
+  { label: 'Finance',         href: '/finance',       module: 'finance',       icon: CircleDollarSign },
+  { label: 'Expenses',        href: '/expenses',      module: 'expenses',      icon: CreditCard },
+  { label: 'Tax & Compliance',href: '/tax',           module: 'tax',           icon: FileCheck2 },
+  { label: 'Reports',         href: '/reports',       module: 'reports',       icon: LineChart },
+  { label: 'Notifications',   href: '/notifications', module: 'notifications', icon: BellRing },
+  { label: 'AI Dashboard',    href: '/ai',            module: 'ai',            icon: Brain },
+  { label: 'Settings',        href: '/settings',      module: 'settings',      icon: SlidersHorizontal },
 ];
 
 /** Returns only the nav items the given permission list grants `:view` on. */

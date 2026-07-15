@@ -118,18 +118,20 @@ export function DataTable<TData>({
   return (
     <div className="space-y-4">
       {onSearchChange && (
-        <div className="relative max-w-sm">
-          <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        // Pill-shaped search bar with a brand-coloured icon
+        <div className="relative max-w-xs">
+          <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-primary/60" />
           <Input
             value={search ?? ''}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder={searchPlaceholder}
-            className="pl-8"
+            className="h-9 rounded-full border-border/60 bg-background/70 pl-9 shadow-sm backdrop-blur-sm focus-visible:ring-primary/30"
           />
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border">
+      {/* Table container — rounded with a subtle brand ring */}
+      <div className="overflow-x-auto rounded-xl border border-border/50 shadow-sm ring-1 ring-primary/5">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -140,16 +142,17 @@ export function DataTable<TData>({
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder ? null : canSort ? (
+                        // Sortable column — icon changes colour when active
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="-ml-3 h-7"
+                          className="-ml-3 h-7 font-semibold uppercase tracking-widest text-[0.7rem] text-primary/75 hover:text-primary"
                           onClick={header.column.getToggleSortingHandler()}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
-                          {sortState === 'asc' && <ArrowUpIcon />}
-                          {sortState === 'desc' && <ArrowDownIcon />}
-                          {!sortState && <ArrowUpDownIcon className="text-muted-foreground/50" />}
+                          {sortState === 'asc' && <ArrowUpIcon className="text-primary" />}
+                          {sortState === 'desc' && <ArrowDownIcon className="text-primary" />}
+                          {!sortState && <ArrowUpDownIcon className="text-muted-foreground/40" />}
                         </Button>
                       ) : (
                         flexRender(header.column.columnDef.header, header.getContext())
@@ -222,15 +225,28 @@ function DataTablePagination({
   const setPageSize = (size: number) => onPaginationChange({ pageIndex: 0, pageSize: size });
 
   return (
-    <div className="flex flex-col-reverse items-center justify-between gap-4 sm:flex-row">
-      <p className="text-sm text-muted-foreground">
-        {rowCount === 0 ? 'No rows' : `Showing ${from}-${to} of ${rowCount}`}
+    // Pagination toolbar — row count left, controls right
+    <div className="flex flex-col-reverse items-center justify-between gap-4 rounded-lg border border-border/40 bg-muted/30 px-4 py-2.5 sm:flex-row">
+      {/* Row count badge */}
+      <p className="text-xs font-medium text-muted-foreground">
+        {rowCount === 0 ? (
+          'No rows'
+        ) : (
+          <>
+            Showing{' '}
+            <span className="font-semibold text-foreground">{from}–{to}</span>
+            {' '}of{' '}
+            <span className="font-semibold text-foreground">{rowCount}</span>
+          </>
+        )}
       </p>
-      <div className="flex items-center gap-6">
+
+      <div className="flex items-center gap-5">
+        {/* Rows-per-page selector */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Rows per page</span>
+          <span className="text-xs text-muted-foreground">Rows per page</span>
           <Select value={String(pageSize)} onValueChange={(value) => setPageSize(Number(value))}>
-            <SelectTrigger size="sm" className="w-[70px]">
+            <SelectTrigger size="sm" className="w-[70px] rounded-lg border-primary/20 bg-background text-xs font-medium">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -242,31 +258,38 @@ function DataTablePagination({
             </SelectContent>
           </Select>
         </div>
+
+        {/* Page navigation buttons */}
         <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon" disabled={pageIndex === 0} onClick={() => setPageIndex(0)}>
-            <ChevronsLeftIcon />
+          <Button variant="outline" size="icon" disabled={pageIndex === 0} onClick={() => setPageIndex(0)}
+            className="size-7 rounded-lg border-border/50 hover:border-primary/40 hover:bg-primary/8">
+            <ChevronsLeftIcon className="size-3.5" />
           </Button>
-          <Button variant="outline" size="icon" disabled={pageIndex === 0} onClick={() => setPageIndex(pageIndex - 1)}>
-            <ChevronLeftIcon />
+          <Button variant="outline" size="icon" disabled={pageIndex === 0} onClick={() => setPageIndex(pageIndex - 1)}
+            className="size-7 rounded-lg border-border/50 hover:border-primary/40 hover:bg-primary/8">
+            <ChevronLeftIcon className="size-3.5" />
           </Button>
-          <span className="px-2 text-sm text-muted-foreground">
-            Page {pageCount === 0 ? 0 : pageIndex + 1} of {pageCount}
+
+          {/* Current page pill */}
+          <span className="min-w-20 rounded-md bg-primary/10 px-3 py-1 text-center text-xs font-semibold text-primary">
+            {pageCount === 0 ? 0 : pageIndex + 1} / {pageCount}
           </span>
+
           <Button
-            variant="outline"
-            size="icon"
+            variant="outline" size="icon"
             disabled={pageIndex >= pageCount - 1}
             onClick={() => setPageIndex(pageIndex + 1)}
+            className="size-7 rounded-lg border-border/50 hover:border-primary/40 hover:bg-primary/8"
           >
-            <ChevronRightIcon />
+            <ChevronRightIcon className="size-3.5" />
           </Button>
           <Button
-            variant="outline"
-            size="icon"
+            variant="outline" size="icon"
             disabled={pageIndex >= pageCount - 1}
             onClick={() => setPageIndex(pageCount - 1)}
+            className="size-7 rounded-lg border-border/50 hover:border-primary/40 hover:bg-primary/8"
           >
-            <ChevronsRightIcon />
+            <ChevronsRightIcon className="size-3.5" />
           </Button>
         </div>
       </div>
