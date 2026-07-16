@@ -1,0 +1,11 @@
+node_modules
+.git
+*.db
+apps/web
+apps/api/dist
+apps/api/uploads
+apps/api/.env
+packages/shared/dist
+.env
+.env.*
+!.env.example

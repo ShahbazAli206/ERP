@@ -5,6 +5,6 @@ export interface SystemLogDto {
   action: string;
   entityType: string;
   entityId: string | null;
-  metadata: string | null;
+  metadata: unknown;
   createdAt: Date;
 }

@@ -10,6 +10,11 @@ const envSchema = z.object({
   UPLOAD_DIR: z.string().default('./uploads'),
   MAX_UPLOAD_SIZE_MB: z.coerce.number().default(10),
 
+  // Comma-separated list of allowed frontend origins for CORS.
+  // Example: "https://your-app.vercel.app,https://custom-domain.com"
+  // Leave blank in development to allow all origins.
+  CORS_ORIGIN: z.string().optional(),
+
   // --- Placeholders for future integrations (Phase 4 abstraction layers). Blank/unset in
   // the demo — the fake implementations under shared/integrations/ never read these, they
   // exist purely so a real implementation can be dropped in later without a config change. ---

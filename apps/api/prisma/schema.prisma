@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ===================== Auth & RBAC =====================
@@ -631,7 +631,7 @@ model AuditLog {
   action     String
   entityType String
   entityId   String?
-  metadata   String?
+  metadata   Json?
   createdAt  DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id])

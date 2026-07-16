@@ -63,8 +63,9 @@ export function LoginForm() {
   });
 
   /** When a role is selected, auto-fill its credentials into the form. */
-  function handleRoleChange(role: string) {
-    setSelectedRole(role);
+  function handleRoleChange(role: string | null) {
+    if (!role) return;
+    setSelectedRole(role as typeof DEFAULT_ACCOUNT.role);
     const account = DEMO_ACCOUNTS.find((a) => a.role === role);
     if (account) {
       form.setValue('email', account.email, { shouldValidate: true });

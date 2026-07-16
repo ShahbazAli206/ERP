@@ -29,7 +29,14 @@ export function createApp() {
   const app = express();
 
   app.use(helmet());
-  app.use(cors());
+
+  // In production, restrict CORS to the Vercel frontend origin(s) set via CORS_ORIGIN.
+  // In development, allow all origins for convenience.
+  const corsOrigin = env.CORS_ORIGIN
+    ? env.CORS_ORIGIN.split(',').map((o) => o.trim())
+    : true;
+  app.use(cors({ origin: corsOrigin, credentials: true }));
+
   app.use(compression());
   app.use(express.json());
   app.use(cookieParser());
