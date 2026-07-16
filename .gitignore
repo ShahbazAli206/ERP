@@ -16,5 +16,4 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
-# Sensitive configuration
-configuration.txt
+
